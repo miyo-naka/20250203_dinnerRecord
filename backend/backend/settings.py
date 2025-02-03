@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-=-s0%1r&bc@ns^wsqrazzr=2aun9u%+6-w8@&fu876^35lt^yf
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -127,6 +127,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # フロントエンド（Vite）との通信を許可
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Viteのデフォルトポート
-]
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173"]

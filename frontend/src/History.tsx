@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "./api.ts";
 import "./History.css";
 
 type Record = {
@@ -15,7 +16,7 @@ const History = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/history/") // DjangoのAPIエンドポイント
+    fetch("http://127.0.0.1:8000/api/history/")
       .then((response) => {
         if (!response.ok) {
           throw new Error("データの取得に失敗しました");
@@ -32,12 +33,25 @@ const History = () => {
       });
   }, []);
 
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await axios.delete(
+        `http://127.0.0.1:8000/api/delete-dinner-record/${id}/`
+      );
+      console.log(response.data.message);
+      setRecords(records.filter((record) => record.id !== id));
+    } catch (error) {
+      console.error("削除エラー：", error);
+      alert("削除に失敗しました");
+    }
+  };
+
   if (loading) return <p>読み込み中...</p>;
   if (error) return <p style={{ color: "red" }}>エラー: {error}</p>;
 
   return (
     <>
-      <h2>夕ご飯の記録</h2>
+      <h2>ごはんの記録</h2>
       {records.length === 0 ? (
         <p>記録がありません</p>
       ) : (
@@ -47,6 +61,7 @@ const History = () => {
               <th>日付</th>
               <th>料理名</th>
               <th>メモ</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -55,6 +70,9 @@ const History = () => {
                 <td>{record.date}</td>
                 <td>{record.dish_name}</td>
                 <td>{record.description}</td>
+                <td>
+                  <button onClick={() => handleDelete(record.id)}>削除</button>
+                </td>
               </tr>
             ))}
           </tbody>
