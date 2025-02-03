@@ -32,7 +32,7 @@ const Record = () => {
 
   return (
     <>
-      <h2>夕ご飯の記録</h2>
+      <h2>ごはんを記録する</h2>
       <form onSubmit={handleSubmit}>
         <label>
           日付
