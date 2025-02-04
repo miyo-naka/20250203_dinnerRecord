@@ -15,8 +15,13 @@ const History = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [page, setPage] = useState(1);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrevious, setHasPrevious] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
+
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/history/")
+    fetch(`http://127.0.0.1:8000/api/history/?page=${page}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("データの取得に失敗しました");
@@ -24,14 +29,17 @@ const History = () => {
         return response.json();
       })
       .then((data) => {
-        setRecords(data);
+        setRecords(data.records);
+        setHasNext(data.has_next);
+        setHasPrevious(data.has_previous);
+        setTotalPages(data.total_pages);
         setLoading(false);
       })
       .catch((err) => {
         setError(err.message);
         setLoading(false);
       });
-  }, []);
+  }, [page]);
 
   const handleDelete = async (id: number) => {
     try {
@@ -78,7 +86,15 @@ const History = () => {
           </tbody>
         </table>
       )}
-
+      <button disabled={!hasPrevious} onClick={() => setPage(page - 1)}>
+        Prev
+      </button>
+      <span>
+        {page} / {totalPages}
+      </span>
+      <button disabled={!hasNext} onClick={() => setPage(page + 1)}>
+        Next
+      </button>
       <Link to="/">
         <button>戻る</button>
       </Link>

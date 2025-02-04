@@ -25,9 +25,9 @@ def record_dinner(request):
 
 def history(request):
     dinners = DinnerRecord.objects.order_by("-date")
-    
+
     page_number = request.GET.get("page", 1)
-    items_per_page = 10
+    items_per_page = 7
     paginator = Paginator(dinners, items_per_page)
     page_obj = paginator.get_page(page_number)
 
@@ -38,7 +38,7 @@ def history(request):
         "total_pages": paginator.num_pages,
         "current_page": page_obj.number,
     }
-    return JsonResponse(data, safe=False)
+    return JsonResponse(data)
 
 
 @csrf_exempt
