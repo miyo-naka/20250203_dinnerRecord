@@ -8,7 +8,7 @@ from .serializers import DinnerRecordSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-
+from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 # from django.views.decorators.csrf import ensure_csrf_cookie
 # from django.utils.decorators import method_decorator
@@ -24,8 +24,20 @@ def record_dinner(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def history(request):
-    dinners = DinnerRecord.objects.all()
-    data = list(dinners.values("id", "date", "dish_name", "description"))
+    dinners = DinnerRecord.objects.order_by("-date")
+    
+    page_number = request.GET.get("page", 1)
+    items_per_page = 10
+    paginator = Paginator(dinners, items_per_page)
+    page_obj = paginator.get_page(page_number)
+
+    data = {
+        "records": list(page_obj.object_list.values("id", "date", "dish_name", "description")),
+        "has_next": page_obj.has_next(),
+        "has_previous": page_obj.has_previous(),
+        "total_pages": paginator.num_pages,
+        "current_page": page_obj.number,
+    }
     return JsonResponse(data, safe=False)
 
 
