@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 # Create your views here.
+import json
 from django.http import JsonResponse
 from .models import DinnerRecord
 from .serializers import DinnerRecordSerializer
@@ -8,7 +9,7 @@ from .serializers import DinnerRecordSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-
+from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 # from django.views.decorators.csrf import ensure_csrf_cookie
 # from django.utils.decorators import method_decorator
@@ -24,9 +25,47 @@ def record_dinner(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def history(request):
-    dinners = DinnerRecord.objects.all()
-    data = list(dinners.values("id", "date", "dish_name", "description"))
-    return JsonResponse(data, safe=False)
+    dinners = DinnerRecord.objects.order_by("-date")
+
+    page_number = request.GET.get("page", 1)
+    items_per_page = 7
+    paginator = Paginator(dinners, items_per_page)
+    page_obj = paginator.get_page(page_number)
+
+    data = {
+        "records": list(page_obj.object_list.values("id", "date", "dish_name", "description")),
+        "has_next": page_obj.has_next(),
+        "has_previous": page_obj.has_previous(),
+        "total_pages": paginator.num_pages,
+        "current_page": page_obj.number,
+    }
+    return JsonResponse(data)
+
+@csrf_exempt
+def update_record(request, record_id):
+    if request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            record = DinnerRecord.objects.get(id=record_id)
+
+            record.date = data.get("date", record.date)
+            record.dish_name = data.get("dish_name", record.dish_name)
+            record.description = data.get("description", record.description)
+            record.save()
+
+            return JsonResponse({"message": "記録が更新されました", "record":{
+                "id": record.id,
+                "date": record.date,
+                "dish_name": record.dish_name,
+                "description": record.description
+            }}, status=200)
+
+        except DinnerRecord.DoesNotExist:
+            return JsonResponse({"error": "記録が見つかりません"}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "無効なJSON形式です"}, status=400)
+
+    return JsonResponse({"error": "無効なリクエストです"}, status=400)
 
 
 @csrf_exempt

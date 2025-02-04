@@ -6,5 +6,5 @@ urlpatterns = [
     path('history/', views.history, name='history'),
     path('delete-dinner-record/<int:record_id>/', views.delete_dinner_record, name='delete'),
     # path('get_csrf_token/', views.get_csrf_token, name='get_csrf_token'),
-    
+    path('update-dinner-record/<int:record_id>/', views.update_record, name='update_record'),
 ]
