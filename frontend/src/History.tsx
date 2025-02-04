@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "./api.ts";
 import "./History.css";
+import EditRecordForm from "./EditRecordForm.tsx";
 
-type Record = {
+export type Record = {
   id: number;
   date: string;
   dish_name: string;
@@ -14,6 +15,7 @@ const History = () => {
   const [records, setRecords] = useState<Record[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editRecord, setEditRecord] = useState<Record | null>(null);
 
   const [page, setPage] = useState(1);
   const [hasNext, setHasNext] = useState(false);
@@ -40,6 +42,31 @@ const History = () => {
         setLoading(false);
       });
   }, [page]);
+
+  const handleEdit = (record: Record) => {
+    setEditRecord(record);
+  };
+
+  const handleUpdate = async (updatedRecord: Record) => {
+    try {
+      console.log("送信データ:", updatedRecord);
+      const response = await axios.put(
+        `http://127.0.0.1:8000/api/update-dinner-record/${updatedRecord.id}/`,
+        updatedRecord
+      );
+
+      setRecords(
+        records.map((record) =>
+          record.id === updatedRecord.id ? updatedRecord : record
+        )
+      );
+      alert(response.data.message);
+      setEditRecord(null); // 編集フォームを閉じる
+    } catch (error) {
+      console.error("更新エラー：", error);
+      alert("更新に失敗しました");
+    }
+  };
 
   const handleDelete = async (id: number) => {
     try {
@@ -70,6 +97,7 @@ const History = () => {
               <th>料理名</th>
               <th>メモ</th>
               <th></th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -78,6 +106,9 @@ const History = () => {
                 <td>{record.date}</td>
                 <td>{record.dish_name}</td>
                 <td>{record.description}</td>
+                <td>
+                  <button onClick={() => handleEdit(record)}>編集</button>
+                </td>
                 <td>
                   <button onClick={() => handleDelete(record.id)}>削除</button>
                 </td>
@@ -98,6 +129,15 @@ const History = () => {
       <Link to="/">
         <button>戻る</button>
       </Link>
+
+      {/* 編集フォーム（EditRecordForm）を表示 */}
+      {editRecord && (
+        <EditRecordForm
+          editRecord={editRecord}
+          setEditRecord={setEditRecord}
+          handleUpdate={handleUpdate}
+        />
+      )}
     </>
   );
 };

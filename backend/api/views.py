@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 # Create your views here.
+import json
 from django.http import JsonResponse
 from .models import DinnerRecord
 from .serializers import DinnerRecordSerializer
@@ -39,6 +40,32 @@ def history(request):
         "current_page": page_obj.number,
     }
     return JsonResponse(data)
+
+@csrf_exempt
+def update_record(request, record_id):
+    if request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            record = DinnerRecord.objects.get(id=record_id)
+
+            record.date = data.get("date", record.date)
+            record.dish_name = data.get("dish_name", record.dish_name)
+            record.description = data.get("description", record.description)
+            record.save()
+
+            return JsonResponse({"message": "記録が更新されました", "record":{
+                "id": record.id,
+                "date": record.date,
+                "dish_name": record.dish_name,
+                "description": record.description
+            }}, status=200)
+
+        except DinnerRecord.DoesNotExist:
+            return JsonResponse({"error": "記録が見つかりません"}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "無効なJSON形式です"}, status=400)
+
+    return JsonResponse({"error": "無効なリクエストです"}, status=400)
 
 
 @csrf_exempt
