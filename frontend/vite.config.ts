@@ -7,4 +7,5 @@ export default defineConfig({
   build: {
     outDir: "build", // デフォルトの dist を build に変更
   },
+  base: "/20250203_dinnerRecord/",
 });

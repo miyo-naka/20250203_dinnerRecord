@@ -1,7 +1,7 @@
 // //src/App.tsx
 // import { useEffect, useState } from "react";
 // import { fetchHello } from "./api";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./Home";
 import Record from "./Record";
 import History from "./History";
