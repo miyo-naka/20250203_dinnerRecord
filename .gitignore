@@ -1,0 +1,57 @@
+# OS固有の不要ファイル
+.DS_Store
+Thumbs.db
+
+# Python関連
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment（仮想環境）
+venv/
+env/
+
+# Django関連
+*.sqlite3
+db.sqlite3
+/media/
+staticfiles/
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+.mypy_cache/
+.pytest_cache/
+.coverage
+
+# 環境変数ファイル
+.env
+.env.local
+
+#frontend側
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
