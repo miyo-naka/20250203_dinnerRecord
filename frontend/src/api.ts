@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // 環境変数から API の URL を取得（デフォルトはローカル）
-export const BASE_URL = "https://miyo.pythonanywhere.com/api";
+export const BASE_URL = "http://localhost:8000/api";
 
 // `axios.create()` でカスタムインスタンスを作成
 const api = axios.create({
