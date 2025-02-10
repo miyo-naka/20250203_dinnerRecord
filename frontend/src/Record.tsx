@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import "./Record.css";
+import api from "./api";
 
 const Record = () => {
   const [date, setDate] = useState("");
@@ -11,8 +11,8 @@ const Record = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/record-dinner/",
+      const response = await api.post(
+        "/record-dinner/",
         // 変数名をキャメルケースからスネークケースに変換
         {
           date: date,

@@ -1,8 +1,29 @@
 import axios from "axios";
 
-// CSRFトークンをクッキー名とヘッダー名に設定
-axios.defaults.xsrfCookieName = "csrftoken"; // クッキー名
-axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"; // ヘッダー名
-axios.defaults.withCredentials = true; // クッキーを送信する設定
+// 環境変数から API の URL を取得（デフォルトはローカル）
+export const BASE_URL =
+  import.meta.env.VITE_APP_API_URL || "http://localhost:8000/api";
 
-export default axios;
+// `axios.create()` でカスタムインスタンスを作成
+const api = axios.create({
+  baseURL: BASE_URL,
+  withCredentials: true,
+  xsrfCookieName: "csrftoken",
+  xsrfHeaderName: "X-CSRFTOKEN",
+});
+
+//CSRFトークンを自動付与するためのinterceptor
+api.interceptors.request.use((config) => {
+  const token = document.cookie
+    .split(";")
+    .find((row) => row.startsWith("csrftoken="))
+    ?.split("=")[1];
+
+  if (token) {
+    config.headers["X-CSRFToken"] = token;
+  }
+
+  return config;
+});
+
+export default api;

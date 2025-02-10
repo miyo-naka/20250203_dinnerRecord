@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "./api.ts";
+import api from "./api";
 import "./History.css";
 import EditRecordForm from "./EditRecordForm.tsx";
 
@@ -23,14 +23,10 @@ const History = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/history/?page=${page}`)
+    api
+      .get(`/history/?page=${page}`)
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("データの取得に失敗しました");
-        }
-        return response.json();
-      })
-      .then((data) => {
+        const data = response.data;
         setRecords(data.records);
         setHasNext(data.has_next);
         setHasPrevious(data.has_previous);
@@ -50,8 +46,8 @@ const History = () => {
   const handleUpdate = async (updatedRecord: Record) => {
     try {
       console.log("送信データ:", updatedRecord);
-      const response = await axios.put(
-        `http://127.0.0.1:8000/api/update-dinner-record/${updatedRecord.id}/`,
+      const response = await api.put(
+        `/update-dinner-record/${updatedRecord.id}/`,
         updatedRecord
       );
 
@@ -70,9 +66,7 @@ const History = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await axios.delete(
-        `http://127.0.0.1:8000/api/delete-dinner-record/${id}/`
-      );
+      const response = await api.delete(`/delete-dinner-record/${id}/`);
       console.log(response.data.message);
       setRecords(records.filter((record) => record.id !== id));
     } catch (error) {
